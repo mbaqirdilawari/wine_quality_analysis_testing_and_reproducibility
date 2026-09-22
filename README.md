@@ -1,6 +1,6 @@
-# IDS706---Assignment-2
+# IDS706---Assignment-3
 
-# Wine Quality Analysis
+# Wine Quality Analysis - Testing & Reproducibility
 
 ## Project Goal
 
