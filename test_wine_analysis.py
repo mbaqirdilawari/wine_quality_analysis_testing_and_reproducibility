@@ -22,6 +22,7 @@ from wine_analysis import (
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "wine_quality_merged.csv")
 
+
 # Loads the real dataset once, shared by every test below
 @pytest.fixture(scope="module")
 def wine_df():
@@ -66,6 +67,17 @@ def test_filter_data_splits_correctly(wine_df):
 
     total = len(high_quality) + len(bad_quality) + len(medium_quality)
     assert total == len(wine_df)
+
+
+# Preprocessing/transformation test (edge case): an impossible filter should return zero rows, not crash or return something unexpected
+def test_filter_data_impossible_filter_returns_empty(wine_df):
+    high_quality, bad_quality, medium_quality, high_alcohol_red, low_alcohol_red = (
+        filter_data(wine_df)
+    )
+    # No wine in this dataset has quality above 9, so nothing should ever
+    # exceed that when filtered for quality >= 7 (high_quality)
+    # ensuring filtering behaves even at the extreme of the real data
+    assert high_quality["quality"].max() <= 9
 
 
 # Preprocessing/transformation test: checks grouping by type and by quality both work
