@@ -1,4 +1,6 @@
 # IDS706---Assignment-3
+![Tests](https://github.com/mbaqirdilawari/wine_quality_analysis_testing_and_reproducibility/actions/workflows/tests.yml/badge.svg)
+
 
 # Wine Quality Analysis
 ## With Testing & Reproducibility
