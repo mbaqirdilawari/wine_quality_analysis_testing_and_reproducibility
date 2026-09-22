@@ -154,6 +154,18 @@ pytest -v
 
 Every push to this repository also automatically runs these tests via GitHub Actions (see the badge at the top of this README).
 
+**All 10 tests passing locally:**
+
+![All 10 tests passing locally](screenshots/pytest_passing.png)
+
+**GitHub Actions workflow runs (3 successful runs so far):**
+
+![GitHub Actions workflow runs, all successful](screenshots/ci_workflow_runs.png)
+
+**Detailed view of a successful CI run:**
+
+![Detailed view of a successful GitHub Actions run, status Success, 45s](screenshots/ci_run_detail.png)
+
 ---
 
 ## Step-by-step walkthrough
@@ -439,7 +451,6 @@ Since the train/test split was done on the full dataset, repeated rows could lan
 - **Quality was modeled as a continuous number, but it's really an ordinal score from 3-9 assigned by human tasters.** 
 
 Linear regression can predict values like 5.4 that don't correspond to any real score, and treats a 1-point miss the same everywhere on the scale. An ordinal regression or classification approach would match the actual structure of the target variable more closely.
-
 
 
 
