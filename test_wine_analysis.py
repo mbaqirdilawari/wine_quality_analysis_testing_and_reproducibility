@@ -22,7 +22,6 @@ from wine_analysis import (
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "wine_quality_merged.csv")
 
-
 # Loads the real dataset once, shared by every test below
 @pytest.fixture(scope="module")
 def wine_df():
