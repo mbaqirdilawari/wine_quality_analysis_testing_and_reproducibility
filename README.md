@@ -166,6 +166,8 @@ Every push to this repository also automatically runs these tests via GitHub Act
 
 ![Detailed view of a successful GitHub Actions run, status Success, 45s](screenshots/ci_run_detail.png)
 
+## Tests Summary
+
 `test_import_dataset_returns_expected_shape` checks that the CSV loads correctly and has the expected 6,497 rows and 13 columns.<br>
 `test_import_dataset_missing_file_raises` checks that trying to load a file that doesn't exist raises a clear error instead of failing silently.<br>
 `test_inspect_data_finds_known_duplicate_count` checks that the known 1,177 duplicate rows in the dataset are detected correctly.<br>
@@ -176,6 +178,7 @@ Every push to this repository also automatically runs these tests via GitHub Act
 `test_plot_boxplot_creates_file` checks that the boxplot function actually saves a real, non-empty image file.<br>
 `test_plot_scatter_creates_file` checks that the scatter plot function actually saves a real, non-empty image file.<br>
 `test_end_to_end_pipeline_runs_without_error` runs the entire pipeline from start to finish, exactly like analysis.py does, to confirm every step still works correctly together as a whole.<br>
+
 Alongside these, the GitHub Actions workflow automatically installs the project's dependencies and runs this full test suite every time code is pushed to the repository, so any change that breaks something gets caught right away instead of being discovered later.
 
 ---
