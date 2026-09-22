@@ -3,7 +3,7 @@
 
 
 # Wine Quality Analysis
-## With Testing & Reproducibility
+### With Testing & Reproducibility
 
 ## Project Goal
 
@@ -16,6 +16,7 @@ This project is focused on practicing the core fundamentals of data analysis usi
 
 The emphasis throughout is on understanding *why* each step matters, not just running the code.
 
+This phase of the project builds on that original analysis by focusing on making it **reproducible and reliable**: the analysis logic was refactored into individually testable functions, a suite of unit and system tests was added to verify each step works correctly, and a GitHub Actions workflow now runs those tests automatically on every push.
 
 You can run it through pandas via the `"analysis.py"` file. Pandas is the widely-supported default with the biggest ecosystem.
 
@@ -25,6 +26,7 @@ Or you can run it through polars via the `"analysis_polars.py"` file. Polars are
 
 - [The Dataset](#the-dataset)
 - [How to Run](#how-to-run-this)
+- [Testing & CI](#testing--ci)
 - [Step by Step walkthrough](#step-by-step-walkthrough)
   - [Step 1: Importing the dataset](#step-1-importing-the-dataset)
   - [Step 2: Inspecting the Data](#step-2-inspecting-the-data)
@@ -139,6 +141,18 @@ If you'd rather not type each command separately, this repo includes a `Makefile
 - `make run` - runs `analysis.py` (does step 5 for you)
 - `make run-polars` - runs `analysis_polars.py`, the Polars version plus the benchmark
 - `make clean` - deletes the generated charts and cached Python files, useful if you want a fresh run
+
+## Testing & CI
+
+This project includes a suite of unit and system tests in `test_wine_analysis.py`, covering data loading, preprocessing/filtering, grouping, model training and evaluation, and chart generation, plus one end-to-end test that runs the full pipeline.
+
+Run the tests with:
+
+```bash
+pytest -v
+```
+
+Every push to this repository also automatically runs these tests via GitHub Actions (see the badge at the top of this README).
 
 ---
 
