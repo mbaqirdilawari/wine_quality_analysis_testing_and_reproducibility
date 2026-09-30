@@ -13,8 +13,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib
 
 matplotlib.use("Agg")  # lets charts save without needing an actual screen
-import matplotlib.pyplot as plt
-import seaborn as sns
+import matplotlib.pyplot as plt  # noqa: E402
+import seaborn as sns  # noqa: E402
 
 FEATURES = ["alcohol", "volatile acidity", "sulphates"]
 

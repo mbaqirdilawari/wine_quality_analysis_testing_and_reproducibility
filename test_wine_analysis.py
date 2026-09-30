@@ -47,7 +47,8 @@ def test_inspect_data_finds_known_duplicate_count(wine_df):
     assert duplicate_count == 1177
 
 
-# Preprocessing/transformation test: checks each of the 5 filters returns only matching rows
+# Preprocessing/transformation test: checks each of the 5 filters
+# returns only matching rows
 def test_filter_data_splits_correctly(wine_df):
     high_quality, bad_quality, medium_quality, high_alcohol_red, low_alcohol_red = (
         filter_data(wine_df)
@@ -69,7 +70,8 @@ def test_filter_data_splits_correctly(wine_df):
     assert total == len(wine_df)
 
 
-# Preprocessing/transformation test (edge case): an impossible filter should return zero rows, not crash or return something unexpected
+# Preprocessing/transformation test (edge case): an impossible filter should
+# return zero rows, not crash or return something unexpected
 def test_filter_data_impossible_filter_returns_empty(wine_df):
     high_quality, bad_quality, medium_quality, high_alcohol_red, low_alcohol_red = (
         filter_data(wine_df)
