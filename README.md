@@ -152,19 +152,24 @@ Run the tests with:
 pytest -v
 ```
 
-Every push to this repository also automatically runs these tests via GitHub Actions (see the badge at the top of this README).
+A GitHub Actions workflow (`.github/workflows/tests.yml`) checks the project automatically:
+
+- **When it runs:** on every push and pull request, every Monday at 9am ET (scheduled run), and on demand via the "Run workflow" button
+- **Matrix strategy:** the full suite runs in parallel on Python 3.11, 3.12 and 3.13
+- **Quality checks:** `black --check` (formatting) and `flake8` (linting) must pass before the tests run
+- **Status:** see the badge at the top of this README
 
 **All 10 tests passing locally:**
 
 ![All 10 tests passing locally](screenshots/pytest_passing.png)
 
-**GitHub Actions workflow runs (3 successful runs so far):**
+**GitHub Actions workflow runs:**
 
 ![GitHub Actions workflow runs, all successful](screenshots/ci_workflow_runs.png)
 
-**Detailed view of a successful CI run:**
+**Matrix run: tests passing on Python 3.11, 3.12 and 3.13:**
 
-![Detailed view of a successful GitHub Actions run, status Success, 45s](screenshots/ci_run_detail.png)
+![CI matrix run with all three Python versions passing](screenshots/ci_matrix_run.png)
 
 ## Tests Summary
 
