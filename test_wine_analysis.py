@@ -13,6 +13,7 @@ import pytest
 from wine_analysis import (
     import_dataset,
     inspect_data,
+    apply_filter,
     filter_data,
     group_data,
     train_model,
@@ -80,6 +81,17 @@ def test_filter_data_impossible_filter_returns_empty(wine_df):
     # exceed that when filtered for quality >= 7 (high_quality)
     # ensuring filtering behaves even at the extreme of the real data
     assert high_quality["quality"].max() <= 9
+
+
+# Preprocessing test for the apply_filter helper: returns only matching rows,
+# and an impossible condition returns an empty result instead of crashing
+def test_apply_filter_returns_only_matching_rows(wine_df):
+    white_wines = apply_filter(wine_df, "type == 'white'", "White wines")
+    assert len(white_wines) > 0
+    assert (white_wines["type"] == "white").all()
+
+    none_found = apply_filter(wine_df, "quality > 10", "Impossible wines")
+    assert none_found.empty
 
 
 # Preprocessing/transformation test: checks grouping by type and by quality both work

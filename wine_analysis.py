@@ -18,6 +18,23 @@ import seaborn as sns  # noqa: E402
 
 FEATURES = ["alcohol", "volatile acidity", "sulphates"]
 
+# Thresholds used to filter wines in Step 3
+HIGH_QUALITY_MIN = 7
+LOW_QUALITY_MAX = 4
+HIGH_ALCOHOL_MIN = 12
+LOW_ALCOHOL_MAX = 10
+
+# Columns shown when previewing each filtered group of wines
+PREVIEW_COLUMNS = ["type", "alcohol", "quality"]
+
+# Alcohol statistics shared by both groupings in Step 4
+ALCOHOL_STATS = {
+    "avg_alcohol": ("alcohol", "mean"),
+    "std_alcohol": ("alcohol", "std"),
+    "min_alcohol": ("alcohol", "min"),
+    "max_alcohol": ("alcohol", "max"),
+}
+
 
 def import_dataset(path):
     # Step 1: Importing the dataset
@@ -40,57 +57,51 @@ def inspect_data(wine):
     return duplicate_count
 
 
+def apply_filter(wine, condition, label):
+    """Keep only the rows matching `condition`, then print a short preview."""
+    subset = wine.query(condition)
+    print(f"{label}: {len(subset)} out of {len(wine)}")
+    print(subset[PREVIEW_COLUMNS].head())
+    return subset
+
+
 def filter_data(wine):
     # Step 3: Filtering
-
-    # Filtering for high quality wines (quality >= 7)
-    high_quality = wine.query("quality >= 7")
-    print(f"High quality wines: {len(high_quality)} out of {len(wine)}")
-    print(high_quality[["type", "alcohol", "quality"]].head())
-
-    # Filtering for bad quality wines (quality <= 4)
-    bad_quality = wine.query("quality <= 4")
-    print(f"Bad quality wines: {len(bad_quality)} out of {len(wine)}")
-    print(bad_quality[["type", "alcohol", "quality"]].head())
-
-    # Filtering for medium quality wines (4 < quality < 7)
-    medium_quality = wine.query("quality > 4 and quality < 7")
-    print(f"Medium quality wines: {len(medium_quality)} out of {len(wine)}")
-    print(medium_quality[["type", "alcohol", "quality"]].head())
-
-    # Filtering for red wines with alcohol content greater than 12%
-    high_alcohol_red = wine.query("type == 'red' and alcohol > 12")
-    print(f"High alcohol red wines: {len(high_alcohol_red)} out of {len(wine)}")
-    print(high_alcohol_red[["type", "alcohol", "quality"]].head())
-
-    # Filtering for red wines with alcohol content less than 10%
-    low_alcohol_red = wine.query("type == 'red' and alcohol < 10")
-    print(f"Low alcohol red wines: {len(low_alcohol_red)} out of {len(wine)}")
-    print(low_alcohol_red[["type", "alcohol", "quality"]].head())
-
+    high_quality = apply_filter(
+        wine, f"quality >= {HIGH_QUALITY_MIN}", "High quality wines"
+    )
+    bad_quality = apply_filter(
+        wine, f"quality <= {LOW_QUALITY_MAX}", "Bad quality wines"
+    )
+    medium_quality = apply_filter(
+        wine,
+        f"quality > {LOW_QUALITY_MAX} and quality < {HIGH_QUALITY_MIN}",
+        "Medium quality wines",
+    )
+    high_alcohol_red = apply_filter(
+        wine,
+        f"type == 'red' and alcohol > {HIGH_ALCOHOL_MIN}",
+        "High alcohol red wines",
+    )
+    low_alcohol_red = apply_filter(
+        wine,
+        f"type == 'red' and alcohol < {LOW_ALCOHOL_MAX}",
+        "Low alcohol red wines",
+    )
     return high_quality, bad_quality, medium_quality, high_alcohol_red, low_alcohol_red
 
 
 def group_data(wine):
     # Step 4: Grouping
-
-    # Group by wine type
     by_type = wine.groupby("type").agg(
-        avg_alcohol=("alcohol", "mean"),
-        std_alcohol=("alcohol", "std"),
-        min_alcohol=("alcohol", "min"),
-        max_alcohol=("alcohol", "max"),
+        **ALCOHOL_STATS,
         avg_quality=("quality", "mean"),
         no_of_wines=("quality", "count"),
     )
     print(by_type)
 
-    # Group by quality score
     by_quality = wine.groupby("quality").agg(
-        avg_alcohol=("alcohol", "mean"),
-        std_alcohol=("alcohol", "std"),
-        min_alcohol=("alcohol", "min"),
-        max_alcohol=("alcohol", "max"),
+        **ALCOHOL_STATS,
         no_of_wines=("alcohol", "count"),
     )
     print(by_quality)
@@ -126,6 +137,16 @@ def train_model(wine):
     return model, mse, r2
 
 
+def save_plot(title, xlabel, ylabel, save_path):
+    """Add a title and axis labels to the current chart, save it, then close it."""
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150)
+    plt.close()
+
+
 def plot_boxplot(wine, save_path):
     # Step 6: Visualization of Boxplot
     plt.figure(figsize=(10, 6))
@@ -136,12 +157,12 @@ def plot_boxplot(wine, save_path):
         hue="type",
         palette={"red": "firebrick", "white": "wheat"},
     )
-    plt.title("Alcohol Content by Wine Quality Score")
-    plt.xlabel("Quality Score")
-    plt.ylabel("Alcohol (%)")
-    plt.tight_layout()
-    plt.savefig(save_path, dpi=150)
-    plt.close()
+    save_plot(
+        "Alcohol Content by Wine Quality Score",
+        "Quality Score",
+        "Alcohol (%)",
+        save_path,
+    )
     print(f"Boxplot is saved as {save_path}")
     return save_path
 
@@ -156,11 +177,8 @@ def plot_scatter(wine, save_path):
         scatter_kws={"alpha": 0.3},
         line_kws={"color": "red"},
     )
-    plt.title("Alcohol Content vs. Density (All Wines)")
-    plt.xlabel("Alcohol (%)")
-    plt.ylabel("Density")
-    plt.tight_layout()
-    plt.savefig(save_path, dpi=150)
-    plt.close()
+    save_plot(
+        "Alcohol Content vs. Density (All Wines)", "Alcohol (%)", "Density", save_path
+    )
     print(f"Scatter plot with trend line saved as {save_path}")
     return save_path
