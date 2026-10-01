@@ -16,3 +16,16 @@ run-polars:
 clean:
 	rm -rf __pycache__
 	rm -f graphs/*.png
+
+# Formats all Python files with black
+format:
+	black .
+
+# Checks code style with flake8 and formatting with black (changes nothing)
+lint:
+	flake8 .
+	black --check .
+
+# Runs the test suite
+test:
+	pytest -v

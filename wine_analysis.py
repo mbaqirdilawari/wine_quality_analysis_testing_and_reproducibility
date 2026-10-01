@@ -2,7 +2,7 @@
 Testable functions, for the Wine Quality analysis pipeline.
 
 Every step from the README walkthrough lives here as its own function.
-analysis.py calls these in order; tests/test_wine_analysis.py calls them
+analysis.py calls these in order; test_wine_analysis.py calls them
 individually to check each step works on its own.
 """
 
@@ -70,7 +70,7 @@ def filter_data(wine):
     high_quality = apply_filter(
         wine, f"quality >= {HIGH_QUALITY_MIN}", "High quality wines"
     )
-    bad_quality = apply_filter(
+    low_quality = apply_filter(
         wine, f"quality <= {LOW_QUALITY_MAX}", "Bad quality wines"
     )
     medium_quality = apply_filter(
@@ -88,7 +88,7 @@ def filter_data(wine):
         f"type == 'red' and alcohol < {LOW_ALCOHOL_MAX}",
         "Low alcohol red wines",
     )
-    return high_quality, bad_quality, medium_quality, high_alcohol_red, low_alcohol_red
+    return high_quality, low_quality, medium_quality, high_alcohol_red, low_alcohol_red
 
 
 def group_data(wine):

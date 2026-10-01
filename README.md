@@ -239,9 +239,14 @@ docker run --rm wine-quality-analysis pytest -v
 - **Named the magic numbers**: thresholds like `7`, `4`, `12` and `10` are now constants (`HIGH_QUALITY_MIN`, `LOW_QUALITY_MAX`, `HIGH_ALCOHOL_MIN`, `LOW_ALCOHOL_MAX`) defined once at the top of the file.
 - **Removed duplicated statistics**: both groupings in `group_data` shared the same four alcohol stats, now defined once in `ALCOHOL_STATS`.
 - **Extracted `save_plot()`**: both chart functions repeated the same title, labels, layout, save and close steps.
+- **Renamed `bad_quality` to `low_quality`** (with VS Code's F2 rename) so the variable matches its threshold, `LOW_QUALITY_MAX`.
+- **Fixed an outdated comment**: the module docstring pointed to a `tests/` folder that doesn't exist.
 - **Added a test** for the new `apply_filter()` helper, covering a normal case and an edge case (an impossible condition returns an empty result).
+- **Added Makefile shortcuts**: `make format`, `make lint` and `make test`.
 
 **Why:** less copy-pasted code means a change only has to be made in one place, and named thresholds make the filtering rules readable at a glance.
+
+**Use of AI:** I used an AI coding assistant to identify code smells (duplicated blocks, magic numbers, an outdated comment) and reviewed each suggestion before applying it. One idea I rejected was replacing the five filters with a loop over a dictionary of conditions: it would be shorter, but `analysis.py` and the tests rely on five clearly named results, so the loop would have made the code harder to read.
 
 **How I verified it still works:**
 
