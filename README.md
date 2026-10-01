@@ -27,6 +27,7 @@ Or you can run it through polars via the `"analysis_polars.py"` file. Polars are
 - [The Dataset](#the-dataset)
 - [How to Run](#how-to-run-this)
 - [Testing & CI](#testing--ci)
+- [Docker](#docker)
 - [Step by Step walkthrough](#step-by-step-walkthrough)
   - [Step 1: Importing the dataset](#step-1-importing-the-dataset)
   - [Step 2: Inspecting the Data](#step-2-inspecting-the-data)
@@ -187,6 +188,47 @@ A GitHub Actions workflow (`.github/workflows/tests.yml`) checks the project aut
 Alongside these, the GitHub Actions workflow automatically installs the project's dependencies and runs this full test suite every time code is pushed to the repository, so any change that breaks something gets caught right away instead of being discovered later.
 
 ---
+
+## Docker
+
+The project is containerized so it runs the same way on any machine, with no local Python setup needed.
+
+**Build the image:**
+
+```bash
+docker build -t wine-quality-analysis .
+```
+
+**Run the analysis:**
+
+```bash
+docker run --rm wine-quality-analysis
+```
+
+**Run the tests inside the container:**
+
+```bash
+docker run --rm wine-quality-analysis pytest -v
+```
+
+**What I learned:**
+
+- An **image** is a packaged snapshot (code + Python + dependencies); a **container** is a running instance of it.
+- Copying `requirements.txt` and installing packages *before* copying the code lets Docker cache that layer, so rebuilds after code changes take seconds.
+- A `.dockerignore` keeps the image small by excluding files the analysis doesn't need (git history, virtual environment, screenshots).
+- Adding a command after the image name (e.g. `pytest -v`) overrides the default `CMD`, so one image can both run the analysis and test it.
+
+**Basic Docker commands (pull, run, images, ps):**
+
+<img src="screenshots/docker_basic_commands.png" width="700">
+
+**Successful image build:**
+
+<img src="screenshots/docker_build.png" width="700">
+
+**All 10 tests passing inside the container:**
+
+<img src="screenshots/docker_run_tests.png" width="700">
 
 ## Step-by-step walkthrough
 
@@ -473,5 +515,4 @@ Since the train/test split was done on the full dataset, repeated rows could lan
 Linear regression can predict values like 5.4 that don't correspond to any real score, and treats a 1-point miss the same everywhere on the scale. An ordinal regression or classification approach would match the actual structure of the target variable more closely.
 
 
-
-**Note: I have added the Rust notebook from the latest Tutorial, with an example of my own, to display what we learnt in class about Python vs Rust.**
+**Note: I have added the Rust notebook from the Tutorial of 2 weeks ago, with an example of my own, to display what we learnt in class about Python vs Rust.**
