@@ -62,7 +62,7 @@ dioxide, total sulfur dioxide, density, pH, sulphates, alcohol, quality, type`
 
 ## How to run this
 
-These steps assume you've already cloned this repository and have a terminal open inside the `wine_quality_analysis_testing_and_reproducibility` folder.
+These steps assume you have already cloned this repository and have a terminal open inside the `wine_quality_analysis_testing_and_reproducibility` folder.
 
 ### 1. Create a virtual environment
 
@@ -72,7 +72,7 @@ Run this in the **terminal**:
 python3 -m venv .venv
 ```
 
-This creates a folder called `.venv` that holds a clean, isolated copy of Python just for this project, so the packages you install don't clash with anything else on your machine.
+This creates a folder called `.venv` that holds a clean, isolated copy of Python just for this project, so the packages you install do not clash with anything else on your machine.
 
 ### 2. Activate the virtual environment
 
@@ -82,7 +82,7 @@ Run this in the **terminal**:
 source .venv/bin/activate
 ```
 
-You'll know it worked because your terminal prompt will now show `(.venv)` at the start of the line. You need to run this activation command every time you open a new terminal window to work on this project.
+You will know it worked because your terminal prompt will now show `(.venv)` at the start of the line. You need to run this activation command every time you open a new terminal window to work on this project.
 
 ### 3. Install the required packages
 
@@ -115,7 +115,7 @@ wine_quality_analysis_testing_and_reproducibility/
 └── README.md
 ```
 
-If you don't have the dataset yet, download it from the Kaggle link in the "Dataset" section above and place it in the `data/` folder.
+If you do not have the dataset yet, download it from the Kaggle link in the "Dataset" section above and place it in the `data/` folder.
 
 ### 5. Run the script
 
@@ -127,7 +127,7 @@ python analysis.py
 
 This runs every step of `analysis.py` from top to bottom: it loads the dataset, prints inspection details, prints the filtering and grouping results, trains the model and prints its performance, saves two charts, then cleans the data and prints the model comparison table.
 
-There's also `analysis_polars.py`, which does the exact same analysis and produces the same
+There is also `analysis_polars.py`, which does the exact same analysis and produces the same
 results using [Polars](https://pola.rs/) instead of Pandas, plus a Pandas-vs-Polars speed
 benchmark as a final step (see the [Pandas vs Polars Benchmark](#pandas-vs-polars-benchmark)
 section below). Run it the same way:
@@ -138,14 +138,14 @@ python analysis_polars.py
 
 ### 6. Check the output
 
-You don't need to run anything for this step. Just look at what happened:
+You do not need to run anything for this step. Just look at what happened:
 
 - All the printed results (row counts, `.describe()` output, filter counts, group tables, model error and R-squared) appear directly in your **terminal**.
 - `analysis.py` creates two image **files** inside the `graphs/` folder: `graphs/quality_vs_alcohol.png` and `graphs/alcohol_vs_density.png`. `analysis_polars.py` creates the Polars equivalents (`graphs/quality_vs_alcohol_polars.png`, `graphs/alcohol_vs_density_polars.png`) plus `graphs/pandas_vs_polars_benchmark.png`. Open these from VS Code's file explorer (or any image viewer) to see the charts.
 
 ### Optional: using the Makefile shortcuts
 
-If you'd rather not type each command separately, this repo includes a `Makefile` with shortcuts. These also run in the **terminal**:
+If you would rather not type each command separately, this repo includes a `Makefile` with shortcuts. These also run in the **terminal**:
 
 - `make setup` - creates the virtual environment and installs the requirements (does steps 1–3 for you)
 - `make run` - runs `analysis.py` (does step 5 for you)
@@ -187,7 +187,7 @@ A GitHub Actions workflow (`.github/workflows/tests.yml`) checks the project aut
 ## Tests Summary
 
 `test_import_dataset_returns_expected_shape` checks that the CSV loads correctly and has the expected 6,497 rows and 13 columns.<br>
-`test_import_dataset_missing_file_raises` checks that trying to load a file that doesn't exist raises a clear error instead of failing silently.<br>
+`test_import_dataset_missing_file_raises` checks that trying to load a file that does not exist raises a clear error instead of failing silently.<br>
 `test_inspect_data_finds_known_duplicate_count` checks that the known 1,177 duplicate rows in the dataset are detected correctly.<br>
 `test_filter_data_splits_correctly` checks that all five filters (high quality, low quality, medium quality, high-alcohol red, low-alcohol red) only keep rows that actually match their condition, and that every wine falls into exactly one quality bucket.<br>
 `test_filter_data_impossible_filter_returns_empty` checks that filtering for an extreme condition still behaves correctly instead of crashing or returning something unexpected.<br>
@@ -197,7 +197,7 @@ A GitHub Actions workflow (`.github/workflows/tests.yml`) checks the project aut
 `test_plot_boxplot_creates_file` checks that the boxplot function actually saves a real, non-empty image file.<br>
 `test_plot_scatter_creates_file` checks that the scatter plot function actually saves a real, non-empty image file.<br>
 `test_clean_data_removes_duplicates_and_keeps_outliers` checks that cleaning removes exactly the 1,177 duplicates, leaves no missing values, and keeps the outliers we decided to keep.<br>
-`test_clean_data_on_clean_data_changes_nothing` checks (edge case) that cleaning data that is already clean doesn't remove anything else.<br>
+`test_clean_data_on_clean_data_changes_nothing` checks (edge case) that cleaning data that is already clean does not remove anything else.<br>
 `test_compare_models_returns_one_row_per_experiment` checks that the model comparison returns one row per experiment, with the right row counts and sensible scores.<br>
 `test_end_to_end_pipeline_runs_without_error` runs the entire pipeline from start to finish, exactly like analysis.py does, to confirm every step still works correctly together as a whole.<br>
 
@@ -231,7 +231,7 @@ docker run --rm wine-quality-analysis pytest -v
 
 - An **image** is a packaged snapshot (code + Python + dependencies); a **container** is a running instance of it.
 - Copying `requirements.txt` and installing packages *before* copying the code lets Docker cache that layer, so rebuilds after code changes take seconds.
-- A `.dockerignore` keeps the image small by excluding files the analysis doesn't need (git history, virtual environment, screenshots).
+- A `.dockerignore` keeps the image small by excluding files the analysis does not need (git history, virtual environment, screenshots).
 - Adding a command after the image name (e.g. `pytest -v`) overrides the default `CMD`, so one image can both run the analysis and test it.
 
 **Basic Docker commands (pull, run, images, ps):**
@@ -255,7 +255,7 @@ docker run --rm wine-quality-analysis pytest -v
 - **Removed duplicated statistics**: both groupings in `group_data` shared the same four alcohol stats, now defined once in `ALCOHOL_STATS`.
 - **Extracted `save_plot()`**: both chart functions repeated the same title, labels, layout, save and close steps.
 - **Renamed `bad_quality` to `low_quality`** (with VS Code's F2 rename) so the variable matches its threshold, `LOW_QUALITY_MAX`.
-- **Fixed an outdated comment**: the module docstring pointed to a `tests/` folder that doesn't exist.
+- **Fixed an outdated comment**: the module docstring pointed to a `tests/` folder that does not exist.
 - **Added a test** for the new `apply_filter()` helper, covering a normal case and an edge case (an impossible condition returns an empty result).
 - **Added Makefile shortcuts**: `make format`, `make lint` and `make test`.
 
@@ -377,7 +377,7 @@ by_quality = wine.groupby("quality").agg(
 
 *White wines average a slightly higher quality score than red (5.88 vs. 5.64) despite very similar average alcohol content (10.51% vs. 10.42%).*
 *White also shows more variation in alcohol (std 1.23 vs. 1.07).* 
-*The alcohol-by-quality relationship isn't perfectly straight-line: quality scores 3 and 4 actually have slightly higher average alcohol (10.2%) than quality 5 (9.8%, the lowest point in the table), but from quality 5 upward the trend climbs steadily and clearly:* 
+*The alcohol-by-quality relationship is not perfectly straight-line: quality scores 3 and 4 actually have slightly higher average alcohol (10.2%) than quality 5 (9.8%, the lowest point in the table), but from quality 5 upward the trend climbs steadily and clearly:* 
 *9.8% → 10.6% → 11.4% → 11.7% → 12.2% across quality 5 through 9. Overall, higher-quality wines do tend to have more alcohol, especially in the upper half of the range.*
 
 ---
@@ -447,7 +447,7 @@ just reading a coefficient. `hue="type"` adds a second comparison for free - red
 
 **Why a boxplot?** 
 
-`quality` only takes a handful of whole-number values (3-9), so it behaves like a category rather than a continuous number. A boxplot is built for exactly that: it groups the continuous variable (alcohol) by each discrete category (quality score) and shows the median, spread, and outliers for every group side by side, which a scatter plot can't do cleanly with so few x-values.
+`quality` only takes a handful of whole-number values (3-9), so it behaves like a category rather than a continuous number. A boxplot is built for exactly that: it groups the continuous variable (alcohol) by each discrete category (quality score) and shows the median, spread, and outliers for every group side by side, which a scatter plot cannot do cleanly with so few x-values.
 
 **What we found:** 
 
@@ -496,7 +496,7 @@ making this pair a clearer, more classic example of what a scatter plot is for.
 
 *The scatter plot shows a clear inverse relationship.*
 *As alcohol content goes up, density tends to go down. The red trend line slopes downward across the whole range, confirming this. Most points are tightly packed in a diagonal band between about 8–14% alcohol and a density of 0.99–1.00, which makes sense chemically: alcohol is less dense than water, so wines with more alcohol are naturally less dense.*
-*There are a few outliers worth noting though. One wine near 11.5% alcohol has an unusually high density (about 1.04), and one near 8.8% alcohol sits at about 1.01, both well above the rest of the cloud. Looking closer, the 1.04 wine is also the sweetest wine in the dataset (residual sugar 65.8), and sugar makes wine denser, so it's a real (if unusual) wine rather than a data error. Aside from those outliers, the relationship is fairly consistent and fits a straight line reasonably well, though the points do fan out a bit more at the lower end of alcohol content than at the higher end.* 
+*There are a few outliers worth noting though. One wine near 11.5% alcohol has an unusually high density (about 1.04), and one near 8.8% alcohol sits at about 1.01, both well above the rest of the cloud. Looking closer, the 1.04 wine is also the sweetest wine in the dataset (residual sugar 65.8), and sugar makes wine denser, so it is a real (if unusual) wine rather than a data error. Aside from those outliers, the relationship is fairly consistent and fits a straight line reasonably well, though the points do fan out a bit more at the lower end of alcohol content than at the higher end.* 
 
 *Check out alcohol_vs_density yourself below and confirm.*
 
@@ -552,7 +552,7 @@ experiments = [
 | All 11 features, duplicates removed | 5,320 | 0.525 | 0.302 |
 
 *Each change helped a little: cleaning raised R² from 0.253 to 0.275, and using all 11 measurements raised it to 0.302, while the error (MSE) went down each time.*
-*Even the best version explains only about 30% of the variation in quality, so chemistry alone can't fully predict how tasters will score a wine.*
+*Even the best version explains only about 30% of the variation in quality, so chemistry alone cannot fully predict how tasters will score a wine.*
 
 ---
 
@@ -560,8 +560,8 @@ experiments = [
 
 *Across the dataset, white wines slightly outperform red on average quality (5.88 vs. 5.64), despite nearly identical average alcohol.* 
 *Alcohol content is genuinely useful for predicting quality, visible both in the by_quality trend and in the regression model.*
-*However, volatile acidity matters more, and in the opposite direction: it's the strongest single predictor of lower quality among the three features tested. The 3-feature linear model captures a real signal (R² = 0.253) but is far from complete, which makes sense, since wine quality is a subjective taster's judgment shaped by more factors than alcohol, volatile acidity, and sulphates alone.*
-*Cleaning the data and using all 11 measurements improved the model a little (R² from 0.253 to 0.302), but most of what makes a wine "good" isn't captured by these chemical measurements.*
+*However, volatile acidity matters more, and in the opposite direction: it is the strongest single predictor of lower quality among the three features tested. The 3-feature linear model captures a real signal (R² = 0.253) but is far from complete, which makes sense, since wine quality is a subjective taster's judgment shaped by more factors than alcohol, volatile acidity, and sulphates alone.*
+*Cleaning the data and using all 11 measurements improved the model a little (R² from 0.253 to 0.302), but most of what makes a wine "good" is not captured by these chemical measurements.*
 
 ---
 
@@ -583,9 +583,9 @@ benchmark_results["polars"]["CSV Read"] = best_of(lambda: pl.read_csv("data/wine
 
 *Polars reads the CSV about 3x faster than Pandas (0.00058s vs 0.00174s), which matches Polars' reputation for a faster, multithreaded, Rust-based CSV parser.*
 *But for `.head()`, filtering, and the groupby, Pandas is as fast or faster than Polars. This is the opposite of what "Polars is faster" would predict, and it comes down to dataset size: the wine dataset has only 6,497 rows. Polars is built around a query-planning and multithreading engine that carries fixed per-call overhead, which pays off on large datasets by parallelizing work across cores, but on a dataset this small that overhead outweighs the actual computation, which Pandas can just do directly in a single tight loop.*
-*In short: for a dataset this size, the choice between Pandas and Polars barely matters for speed. Polars' advantage should grow as the dataset grows into the millions of rows, since that's where its parallel, lazy-evaluation engine starts to amortize its overhead, but that's not something this ~6,500-row dataset can demonstrate.*
+*In short: for a dataset this size, the choice between Pandas and Polars barely matters for speed. Polars' advantage should grow as the dataset grows into the millions of rows, since that is where its parallel, lazy-evaluation engine starts to amortize its overhead, but that is not something this ~6,500-row dataset can demonstrate.*
 
-Run the benchmark (it's the last step of the script):
+Run the benchmark (it is the last step of the script):
 
 ```bash
 python analysis_polars.py
@@ -608,6 +608,6 @@ What still remains:
 
 Even with every chemical measurement, most of the variation in quality is unexplained. Taster scores are subjective, so other information (like grape variety or wine age) would likely be needed to do much better.
 
-- **Quality was modeled as a continuous number, but it's really an ordinal score from 3-9 assigned by human tasters.**
+- **Quality was modeled as a continuous number, but it is really an ordinal score from 3-9 assigned by human tasters.**
 
-Linear regression can predict values like 5.4 that don't correspond to any real score, and treats a 1-point miss the same everywhere on the scale. An ordinal regression or classification approach would match the actual structure of the target variable more closely.
+Linear regression can predict values like 5.4 that do not correspond to any real score, and treats a 1-point miss the same everywhere on the scale. An ordinal regression or classification approach would match the actual structure of the target variable more closely.

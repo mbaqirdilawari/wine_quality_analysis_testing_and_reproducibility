@@ -208,7 +208,7 @@ def plot_scatter(wine, save_path):
 def clean_data(wine):
     # Step 8: Cleaning the data
     # Missing values: none were found in Step 2, so nothing needs filling in.
-    # Duplicates: exact copies are removed, so a wine can't appear in both the
+    # Duplicates: exact copies are removed, so a wine cannot appear in both the
     # training and the test set (which would make the model look better than it is).
     # Outliers: kept on purpose. The most extreme ones are real wines, e.g. the
     # densest wine is also the sweetest, and sugar makes wine denser.

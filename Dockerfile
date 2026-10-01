@@ -4,7 +4,7 @@ FROM python:3.13-slim
 # All following commands run inside the /app folder in the container
 WORKDIR /app
 
-# Don't create .pyc cache files, and show print() output immediately
+# Do not create .pyc cache files, and show print() output immediately
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
