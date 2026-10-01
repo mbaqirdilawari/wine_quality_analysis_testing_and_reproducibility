@@ -1,29 +1,31 @@
-# IDS706---Assignment-3
+# IDS706 - Week 4 Major Assignment
 ![Tests](https://github.com/mbaqirdilawari/wine_quality_analysis_testing_and_reproducibility/actions/workflows/tests.yml/badge.svg)
 
 
 # Wine Quality Analysis
 ### With Testing & Reproducibility
 
-## Project Goal
+## Problem Statement
 
-This project is focused on practicing the core fundamentals of data analysis using Python and Pandas. Using a real, publicly available dataset, the goal is to work through the full basic workflow a Data Scientist would follow: 
-- Loading raw data into a DataFrame
-- Inspecting it to understand its structure and quality (data types, missing values, duplicates)
-- Filtering and grouping it to answer specific questions about the data
-- Training a simple machine learning model to see how well a few variables can predict an outcome
-- Visualizing the results through different types of charts. 
+Wine quality is usually judged by human tasters, which takes time and is subjective. This project asks a question: 
+**Can a few basic chemical measurements (such as alcohol content) give us a good idea of a wine's quality score?**
 
-The emphasis throughout is on understanding *why* each step matters, not just running the code.
-
-This phase of the project builds on that original analysis by focusing on making it **reproducible and reliable**: the analysis logic was refactored into individually testable functions, a suite of unit and system tests was added to verify each step works correctly, and a GitHub Actions workflow now runs those tests automatically on every push.
+To answer it, the project loads and inspects a real dataset of red and white wines, explores it with filtering, grouping and charts, cleans it, and trains a simple linear regression model to predict quality. Along the way, the code is made **reproducible and reliable** with automated tests, a CI workflow, code-quality tools and a Docker container.
 
 You can run it through pandas via the `"analysis.py"` file. Pandas is the widely-supported default with the biggest ecosystem.
 
 Or you can run it through polars via the `"analysis_polars.py"` file. Polars are used when speed and memory efficiency is the priority for larger sets of data.
 
+## Key Findings
+
+- **Alcohol helps, volatile acidity hurts:** higher-quality wines tend to have more alcohol, while volatile acidity (linked to a vinegar-like taste) is the strongest sign of lower quality.
+- **The data needed cleaning:** there were no missing values, but 1,177 rows (about 18%) were exact duplicates. These were removed before the final model comparison. Outliers were kept, because the most extreme ones turned out to be real wines.
+- **Cleaning and more features each helped a little:** R² rose from 0.253 (original model) to 0.275 (duplicates removed) and then to 0.302 (all 11 measurements). See [Step 9](#step-9-comparing-models).
+- **But chemistry alone only explains about 30% of quality:** taste is subjective, so a wine's score depends on more than these lab measurements.
+
 ## Table of Contents
 
+- [Key Findings](#key-findings)
 - [The Dataset](#the-dataset)
 - [How to Run](#how-to-run-this)
 - [Testing & CI](#testing--ci)
@@ -37,6 +39,8 @@ Or you can run it through polars via the `"analysis_polars.py"` file. Polars are
   - [Step 5: Machine Learning model](#step-5-machine-learning-model)
   - [Step 6: Visualization - Boxplot](#step-6-visualization---boxplot)
   - [Step 7: Visualization - Scatter Plot](#step-7-visualization---scatter-plot)
+  - [Step 8: Cleaning the Data](#step-8-cleaning-the-data)
+  - [Step 9: Comparing Models](#step-9-comparing-models)
 - [Overall Findings](#overall-findings)
 - [Pandas vs Polars Benchmark](#pandas-vs-polars-benchmark)
 - [Model Limitations and Future Directions](#model-limitations-and-future-directions)
@@ -58,7 +62,7 @@ dioxide, total sulfur dioxide, density, pH, sulphates, alcohol, quality, type`
 
 ## How to run this
 
-These steps assume you've already cloned this repository and have a terminal open inside the `wine-quality-analysis` folder.
+These steps assume you've already cloned this repository and have a terminal open inside the `wine_quality_analysis_testing_and_reproducibility` folder.
 
 ### 1. Create a virtual environment
 
@@ -88,7 +92,7 @@ Run this in the **terminal** (with the virtual environment still active):
 pip install -r requirements.txt
 ```
 
-This reads the `requirements.txt` file in this repo and installs the libraries both scripts need: `pandas`, `polars`, `pyarrow`, `matplotlib`, `seaborn`, and `scikit-learn`.
+This reads the `requirements.txt` file in this repo and installs the libraries both scripts need: `pandas`, `polars`, `pyarrow`, `matplotlib`, `seaborn`, and `scikit-learn`, plus the tools used for testing and code quality: `pytest`, `black`, and `flake8`.
 
 ### 4. Add the dataset
 
@@ -96,12 +100,16 @@ This is a **file/folder step, not a terminal command**:
 Make sure `wine_quality_merged.csv` is placed inside a folder named `data/`, sitting right next to `analysis.py`. The folder structure should look like this:
 
 ```
-wine-quality-analysis/
-├── analysis.py
-├── analysis_polars.py
+wine_quality_analysis_testing_and_reproducibility/
+├── analysis.py              # runs every step in order
+├── analysis_polars.py       # same analysis using Polars + benchmark
+├── wine_analysis.py         # the functions for each step
+├── test_wine_analysis.py    # the test suite
 ├── data/
 │   └── wine_quality_merged.csv
 ├── graphs/
+├── screenshots/
+├── Dockerfile
 ├── requirements.txt
 ├── Makefile
 └── README.md
@@ -117,7 +125,7 @@ Run this in the **terminal**:
 python analysis.py
 ```
 
-This runs every step of `analysis.py` from top to bottom: it loads the dataset, prints inspection details, prints the filtering and grouping results, trains the model and prints its performance, and finally saves two charts.
+This runs every step of `analysis.py` from top to bottom: it loads the dataset, prints inspection details, prints the filtering and grouping results, trains the model and prints its performance, saves two charts, then cleans the data and prints the model comparison table.
 
 There's also `analysis_polars.py`, which does the exact same analysis and produces the same
 results using [Polars](https://pola.rs/) instead of Pandas, plus a Pandas-vs-Polars speed
@@ -143,6 +151,9 @@ If you'd rather not type each command separately, this repo includes a `Makefile
 - `make run` - runs `analysis.py` (does step 5 for you)
 - `make run-polars` - runs `analysis_polars.py`, the Polars version plus the benchmark
 - `make clean` - deletes the generated charts and cached Python files, useful if you want a fresh run
+- `make test` - runs the test suite
+- `make lint` - checks code style (`flake8`) and formatting (`black --check`)
+- `make format` - automatically formats the code with `black`
 
 ## Testing & CI
 
@@ -161,9 +172,9 @@ A GitHub Actions workflow (`.github/workflows/tests.yml`) checks the project aut
 - **Quality checks:** `black --check` (formatting) and `flake8` (linting) must pass before the tests run
 - **Status:** see the badge at the top of this README
 
-**All 10 tests passing locally:**
+**All tests passing locally:**
 
-![All 10 tests passing locally](screenshots/pytest_passing.png)
+![All tests passing locally](screenshots/pytest_passing.png)
 
 **GitHub Actions workflow runs:**
 
@@ -178,12 +189,16 @@ A GitHub Actions workflow (`.github/workflows/tests.yml`) checks the project aut
 `test_import_dataset_returns_expected_shape` checks that the CSV loads correctly and has the expected 6,497 rows and 13 columns.<br>
 `test_import_dataset_missing_file_raises` checks that trying to load a file that doesn't exist raises a clear error instead of failing silently.<br>
 `test_inspect_data_finds_known_duplicate_count` checks that the known 1,177 duplicate rows in the dataset are detected correctly.<br>
-`test_filter_data_splits_correctly` checks that all five filters (high quality, bad quality, medium quality, high-alcohol red, low-alcohol red) only keep rows that actually match their condition, and that every wine falls into exactly one quality bucket.<br>
+`test_filter_data_splits_correctly` checks that all five filters (high quality, low quality, medium quality, high-alcohol red, low-alcohol red) only keep rows that actually match their condition, and that every wine falls into exactly one quality bucket.<br>
 `test_filter_data_impossible_filter_returns_empty` checks that filtering for an extreme condition still behaves correctly instead of crashing or returning something unexpected.<br>
+`test_apply_filter_returns_only_matching_rows` checks that the `apply_filter` helper keeps only matching rows, and returns an empty result (instead of crashing) for an impossible condition.<br>
 `test_group_data_groups_by_type_and_quality` checks that grouping the data by wine type and by quality score both produce valid, non-empty summary tables.<br>
 `test_train_model_returns_fitted_model_and_metrics` checks that the linear regression model trains successfully and produces sane error and R-squared values.<br>
 `test_plot_boxplot_creates_file` checks that the boxplot function actually saves a real, non-empty image file.<br>
 `test_plot_scatter_creates_file` checks that the scatter plot function actually saves a real, non-empty image file.<br>
+`test_clean_data_removes_duplicates_and_keeps_outliers` checks that cleaning removes exactly the 1,177 duplicates, leaves no missing values, and keeps the outliers we decided to keep.<br>
+`test_clean_data_on_clean_data_changes_nothing` checks (edge case) that cleaning data that is already clean doesn't remove anything else.<br>
+`test_compare_models_returns_one_row_per_experiment` checks that the model comparison returns one row per experiment, with the right row counts and sensible scores.<br>
 `test_end_to_end_pipeline_runs_without_error` runs the entire pipeline from start to finish, exactly like analysis.py does, to confirm every step still works correctly together as a whole.<br>
 
 Alongside these, the GitHub Actions workflow automatically installs the project's dependencies and runs this full test suite every time code is pushed to the repository, so any change that breaks something gets caught right away instead of being discovered later.
@@ -481,11 +496,63 @@ making this pair a clearer, more classic example of what a scatter plot is for.
 
 *The scatter plot shows a clear inverse relationship.*
 *As alcohol content goes up, density tends to go down. The red trend line slopes downward across the whole range, confirming this. Most points are tightly packed in a diagonal band between about 8–14% alcohol and a density of 0.99–1.00, which makes sense chemically: alcohol is less dense than water, so wines with more alcohol are naturally less dense.*
-*There are a few outliers worth noting though. One wine near 11.5% alcohol has an unusually high density (about 1.04), and one near 8.8% alcohol sits at about 1.01, both well above the rest of the cloud. Aside from those outliers, the relationship is fairly consistent and fits a straight line reasonably well, though the points do fan out a bit more at the lower end of alcohol content than at the higher end.* 
+*There are a few outliers worth noting though. One wine near 11.5% alcohol has an unusually high density (about 1.04), and one near 8.8% alcohol sits at about 1.01, both well above the rest of the cloud. Looking closer, the 1.04 wine is also the sweetest wine in the dataset (residual sugar 65.8), and sugar makes wine denser, so it's a real (if unusual) wine rather than a data error. Aside from those outliers, the relationship is fairly consistent and fits a straight line reasonably well, though the points do fan out a bit more at the lower end of alcohol content than at the higher end.* 
 
 *Check out alcohol_vs_density yourself below and confirm.*
 
 ![Alcohol Content vs. Density (All Wines)](graphs/alcohol_vs_density.png)
+
+---
+
+### Step 8: Cleaning the Data
+
+**What this step does:**
+
+Fixes the data problems found in Step 2 before the final model comparison.
+
+```python
+cleaned = wine.drop_duplicates().reset_index(drop=True)
+```
+
+**How each problem was treated:**
+
+- **Missing values:** none. Step 2 showed 0 missing values in every column, so nothing needed filling in.
+- **Duplicates: removed.** The 1,177 exact duplicate rows were dropped, leaving 5,320 unique wines. If a wine and its copy end up on both sides of the train/test split, the model is tested on a wine it has already seen, which makes its score look better than it really is.
+- **Outliers: kept.** The most extreme values are real wines, not mistakes. For example, the densest wine (1.04) is also the sweetest (residual sugar 65.8), and sugar makes wine denser. Removing real wines would hide genuine variety in the data.
+
+**What we found:**
+
+*Removing duplicates shrank the dataset from 6,497 to 5,320 rows, with no missing values left.*
+
+---
+
+### Step 9: Comparing Models
+
+**What this step does:**
+
+Tests two ideas for improving the Step 5 model, using the same linear regression each time:
+
+1. **Clean first:** train on the de-duplicated data from Step 8.
+2. **Use more features:** give the model all 11 chemical measurements instead of just 3.
+
+```python
+experiments = [
+    ("3 features, original data", wine, FEATURES),
+    ("3 features, duplicates removed", cleaned, FEATURES),
+    ("All 11 features, duplicates removed", cleaned, ALL_FEATURES),
+]
+```
+
+**What we found:**
+
+| Model | Rows | MSE | R² |
+|---|---|---|---|
+| 3 features, original data (Step 5) | 6,497 | 0.551 | 0.253 |
+| 3 features, duplicates removed | 5,320 | 0.545 | 0.275 |
+| All 11 features, duplicates removed | 5,320 | 0.525 | 0.302 |
+
+*Each change helped a little: cleaning raised R² from 0.253 to 0.275, and using all 11 measurements raised it to 0.302, while the error (MSE) went down each time.*
+*Even the best version explains only about 30% of the variation in quality, so chemistry alone can't fully predict how tasters will score a wine.*
 
 ---
 
@@ -494,7 +561,7 @@ making this pair a clearer, more classic example of what a scatter plot is for.
 *Across the dataset, white wines slightly outperform red on average quality (5.88 vs. 5.64), despite nearly identical average alcohol.* 
 *Alcohol content is genuinely useful for predicting quality, visible both in the by_quality trend and in the regression model.*
 *However, volatile acidity matters more, and in the opposite direction: it's the strongest single predictor of lower quality among the three features tested. The 3-feature linear model captures a real signal (R² = 0.253) but is far from complete, which makes sense, since wine quality is a subjective taster's judgment shaped by more factors than alcohol, volatile acidity, and sulphates alone.*
-*A model with more features or a non-linear algorithm would likely do meaningfully better.*
+*Cleaning the data and using all 11 measurements improved the model a little (R² from 0.253 to 0.302), but most of what makes a wine "good" isn't captured by these chemical measurements.*
 
 ---
 
@@ -530,17 +597,17 @@ python analysis_polars.py
 
 ## Model Limitations and Future Directions
 
-- **Only 3 of the 11 available chemical features were used, capping R² at 0.253.** 
+Two limitations from earlier versions of this project have now been addressed:
 
-Alcohol, volatile acidity, and sulphates explain just a quarter of the variance in quality. Training on the full feature set, or a non-linear algorithm would likely capture more of the signal the linear model is currently missing.
+- ~~The 1,177 duplicate rows were never removed before training.~~ **Done in Step 8**, so the model is no longer tested on wines it has already seen.
+- ~~Only 3 of the 11 available chemical features were used.~~ **Tested in Step 9**: using all 11 raised R² from 0.275 to 0.302.
 
-- **The 1,177 duplicate rows identified in Step 2 were never removed before training.** 
+What still remains:
 
-Since the train/test split was done on the full dataset, repeated rows could land in both sets, letting the model partly "memorize" wines instead of generalizing. Deduplicating before the split would give a more honest estimate of real-world performance.
+- **R² is still only about 0.30.**
 
-- **Quality was modeled as a continuous number, but it's really an ordinal score from 3-9 assigned by human tasters.** 
+Even with every chemical measurement, most of the variation in quality is unexplained. Taster scores are subjective, so other information (like grape variety or wine age) would likely be needed to do much better.
+
+- **Quality was modeled as a continuous number, but it's really an ordinal score from 3-9 assigned by human tasters.**
 
 Linear regression can predict values like 5.4 that don't correspond to any real score, and treats a 1-point miss the same everywhere on the scale. An ordinal regression or classification approach would match the actual structure of the target variable more closely.
-
-
-**Note: I have added the Rust notebook from the Tutorial of 2 weeks ago, with an example of my own, to display what we learnt in class about Python vs Rust.**

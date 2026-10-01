@@ -10,6 +10,8 @@ from wine_analysis import (
     train_model,
     plot_boxplot,
     plot_scatter,
+    clean_data,
+    compare_models,
 )
 
 pd.set_option("display.max_columns", None)
@@ -45,3 +47,13 @@ plot_boxplot(wine, "graphs/quality_vs_alcohol.png")
 
 # Step 7: Visualization of Scatter Plot with Trend Line
 plot_scatter(wine, "graphs/alcohol_vs_density.png")
+
+print(" " " ")
+
+# Step 8: Cleaning the data (remove duplicates, keep outliers)
+cleaned = clean_data(wine)
+
+print(" " " ")
+
+# Step 9: Comparing models before and after cleaning, with more features
+compare_models(wine, cleaned)

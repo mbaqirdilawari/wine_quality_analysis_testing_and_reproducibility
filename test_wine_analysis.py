@@ -19,6 +19,8 @@ from wine_analysis import (
     train_model,
     plot_boxplot,
     plot_scatter,
+    clean_data,
+    compare_models,
 )
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "wine_quality_merged.csv")
@@ -125,6 +127,33 @@ def test_plot_scatter_creates_file(wine_df, tmp_path):
     plot_scatter(wine_df, str(save_path))
     assert save_path.exists()
     assert save_path.stat().st_size > 0
+
+
+# Cleaning test: duplicates are removed, no missing values remain,
+# and the outliers we decided to keep are still there
+def test_clean_data_removes_duplicates_and_keeps_outliers(wine_df):
+    cleaned = clean_data(wine_df)
+    assert len(cleaned) == len(wine_df) - 1177
+    assert cleaned.duplicated().sum() == 0
+    assert cleaned.isnull().sum().sum() == 0
+    assert cleaned["density"].max() == wine_df["density"].max()
+
+
+# Cleaning test (edge case): cleaning data that is already clean changes nothing
+def test_clean_data_on_clean_data_changes_nothing(wine_df):
+    cleaned_once = clean_data(wine_df)
+    cleaned_twice = clean_data(cleaned_once)
+    assert len(cleaned_twice) == len(cleaned_once)
+
+
+# Model comparison test: one row per experiment, with sensible scores
+def test_compare_models_returns_one_row_per_experiment(wine_df):
+    cleaned = clean_data(wine_df)
+    comparison = compare_models(wine_df, cleaned)
+    assert len(comparison) == 3
+    assert list(comparison["rows"]) == [len(wine_df), len(cleaned), len(cleaned)]
+    assert comparison["r2"].between(-1.0, 1.0).all()
+    assert (comparison["mse"] > 0).all()
 
 
 # System test: runs every step back-to-back, exactly like analysis.py does

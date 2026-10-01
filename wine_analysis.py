@@ -18,6 +18,21 @@ import seaborn as sns  # noqa: E402
 
 FEATURES = ["alcohol", "volatile acidity", "sulphates"]
 
+# All 11 chemical measurements in the dataset (everything except quality and type)
+ALL_FEATURES = [
+    "fixed acidity",
+    "volatile acidity",
+    "citric acid",
+    "residual sugar",
+    "chlorides",
+    "free sulfur dioxide",
+    "total sulfur dioxide",
+    "density",
+    "pH",
+    "sulphates",
+    "alcohol",
+]
+
 # Thresholds used to filter wines in Step 3
 HIGH_QUALITY_MIN = 7
 LOW_QUALITY_MAX = 4
@@ -109,11 +124,9 @@ def group_data(wine):
     return by_type, by_quality
 
 
-def train_model(wine):
-    # Step 5: Machine learning model
-    print("Machine Learning Model: Predicting Wine Quality")
-
-    X = wine[FEATURES]
+def fit_and_score(wine, features):
+    """Train a linear regression on `features` and score it on a held-out 20%."""
+    X = wine[features]
     y = wine["quality"]
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -126,6 +139,14 @@ def train_model(wine):
 
     mse = mean_squared_error(y_test, predictions)
     r2 = r2_score(y_test, predictions)
+    return model, mse, r2
+
+
+def train_model(wine):
+    # Step 5: Machine learning model
+    print("Machine Learning Model: Predicting Wine Quality")
+
+    model, mse, r2 = fit_and_score(wine, FEATURES)
 
     print(f"Mean Squared Error: {mse:.3f}")
     print(f"R-squared: {r2:.3f}")
@@ -182,3 +203,35 @@ def plot_scatter(wine, save_path):
     )
     print(f"Scatter plot with trend line saved as {save_path}")
     return save_path
+
+
+def clean_data(wine):
+    # Step 8: Cleaning the data
+    # Missing values: none were found in Step 2, so nothing needs filling in.
+    # Duplicates: exact copies are removed, so a wine can't appear in both the
+    # training and the test set (which would make the model look better than it is).
+    # Outliers: kept on purpose. The most extreme ones are real wines, e.g. the
+    # densest wine is also the sweetest, and sugar makes wine denser.
+    cleaned = wine.drop_duplicates().reset_index(drop=True)
+    print(f"Missing values in total: {wine.isnull().sum().sum()}")
+    print(f"Duplicate rows removed: {len(wine) - len(cleaned)}")
+    print(f"Rows remaining: {len(cleaned)}")
+    return cleaned
+
+
+def compare_models(wine, cleaned):
+    # Step 9: Comparing models before and after cleaning, with more features
+    experiments = [
+        ("3 features, original data", wine, FEATURES),
+        ("3 features, duplicates removed", cleaned, FEATURES),
+        ("All 11 features, duplicates removed", cleaned, ALL_FEATURES),
+    ]
+    rows = []
+    for name, data, features in experiments:
+        _, mse, r2 = fit_and_score(data, features)
+        rows.append(
+            {"model": name, "rows": len(data), "mse": round(mse, 3), "r2": round(r2, 3)}
+        )
+    comparison = pd.DataFrame(rows)
+    print(comparison.to_string(index=False))
+    return comparison
