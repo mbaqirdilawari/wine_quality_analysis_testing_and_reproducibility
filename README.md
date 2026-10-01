@@ -28,6 +28,7 @@ Or you can run it through polars via the `"analysis_polars.py"` file. Polars are
 - [How to Run](#how-to-run-this)
 - [Testing & CI](#testing--ci)
 - [Docker](#docker)
+- [Refactoring & Code Quality](#refactoring--code-quality)
 - [Step by Step walkthrough](#step-by-step-walkthrough)
   - [Step 1: Importing the dataset](#step-1-importing-the-dataset)
   - [Step 2: Inspecting the Data](#step-2-inspecting-the-data)
@@ -229,6 +230,28 @@ docker run --rm wine-quality-analysis pytest -v
 **All 10 tests passing inside the container:**
 
 <img src="screenshots/docker_run_tests.png" width="700">
+
+## Refactoring & Code Quality
+
+**What I changed** (in `wine_analysis.py`):
+
+- **Extracted `apply_filter()`**: `filter_data` repeated the same 3 lines (query, print count, print preview) five times; each filter is now a single call to this helper.
+- **Named the magic numbers**: thresholds like `7`, `4`, `12` and `10` are now constants (`HIGH_QUALITY_MIN`, `LOW_QUALITY_MAX`, `HIGH_ALCOHOL_MIN`, `LOW_ALCOHOL_MAX`) defined once at the top of the file.
+- **Removed duplicated statistics**: both groupings in `group_data` shared the same four alcohol stats, now defined once in `ALCOHOL_STATS`.
+- **Extracted `save_plot()`**: both chart functions repeated the same title, labels, layout, save and close steps.
+- **Added a test** for the new `apply_filter()` helper, covering a normal case and an edge case (an impossible condition returns an empty result).
+
+**Why:** less copy-pasted code means a change only has to be made in one place, and named thresholds make the filtering rules readable at a glance.
+
+**How I verified it still works:**
+
+- All tests pass (11, including the new one), both locally and in CI
+- `black --check .` and `flake8 .` report no issues
+- The output of `python analysis.py` is identical before and after the refactor: the structure changed, the behavior did not
+
+**Before/after commit diff:** the repeated filter blocks (red) replaced by the `apply_filter` helper (green):
+
+<img src="screenshots/refactor_diff.png" width="700">
 
 ## Step-by-step walkthrough
 
