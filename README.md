@@ -234,7 +234,7 @@ docker run --rm wine-quality-analysis pytest -v
 - A `.dockerignore` keeps the image small by excluding files the analysis does not need (git history, virtual environment, screenshots).
 - Adding a command after the image name (e.g. `pytest -v`) overrides the default `CMD`, so one image can both run the analysis and test it.
 
-**Basic Docker commands (pull, run, images, ps):**
+**Basic Docker commands (run, images, ps):**
 
 <img src="screenshots/docker_basic_commands.png" width="700">
 
@@ -242,7 +242,7 @@ docker run --rm wine-quality-analysis pytest -v
 
 <img src="screenshots/docker_build.png" width="700">
 
-**All 10 tests passing inside the container:**
+**All 14 tests passing inside the container:**
 
 <img src="screenshots/docker_run_tests.png" width="700">
 
